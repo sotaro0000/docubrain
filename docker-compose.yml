@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  # 1. バックエンド (FastAPI)
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8080"  # ホスト:コンテナ
+    volumes:
+      - ./backend:/app # ホットリロード用（コード変更を即反映）
+    depends_on:
+      - db
+
+  # 2. フロントエンド (Next.js)
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - WATCHPACK_POLLING=true # Windows/Macでの変更検知用
+
+  # 3. データベース (PostgreSQL + pgvector)
+  db:
+    image: pgvector/pgvector:pg16  # ベクトル検索対応のPostgreSQL
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: docubrain_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
