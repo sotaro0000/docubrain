@@ -1,0 +1,54 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+jobs:
+  backend-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      - name: コードをチェックアウト
+        uses: actions/checkout@v4
+
+      - name: Pythonのセットアップ
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 依存関係のインストール
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Lintチェック（Ruff)
+        run: |
+          # エラーがあれば即失敗させる
+          ruff check .
+          #フォーマットチェック(修正が必要な場合はエラー)
+          ruff format --check .
+
+      - name: テストとカバレッジ測定(Pytest)
+        run: |
+          # テストを実行し、カバレッジレポートを出力
+          pytest --cov=. --cov-report=term-missing --cov-fail-under=80
+
+  frontend-check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm CI
+      - run: npm run lint
+      - run: npm run build
