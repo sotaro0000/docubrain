@@ -3,6 +3,7 @@ from main import app
 
 client = TestClient(app)
 
+
 def test_read_root():
     """ルートエンドポイントの正常系テスト"""
     response = client.get("/")
