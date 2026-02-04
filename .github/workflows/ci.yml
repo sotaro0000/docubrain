@@ -11,6 +11,20 @@ jobs:
     defaults:
       run:
         working-directory: ./backend
+    services:
+      db:
+        image: pgvector/pgvector:pg16  
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: docubrain_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - name: コードをチェックアウト
@@ -35,6 +49,8 @@ jobs:
           ruff format --check .
 
       - name: テストとカバレッジ測定(Pytest)
+        env:
+          DATABASE_URL: postgresql://user:password@localhost:5432/docubrain_db
         run: |
           # テストを実行し、カバレッジレポートを出力
           pytest --cov=. --cov-report=term-missing --cov-fail-under=80
@@ -54,3 +70,4 @@ jobs:
       - run: npm run lint
 
       - run: npm run build
+
