@@ -2,12 +2,12 @@ from fastapi import FastAPI
 from database import engine, Base
 from routers import users
 
-#DBテーブルの作成
+# DBテーブルの作成
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-#ルータ登録
+# ルータ登録
 app.include_router(users.router)
 
 
