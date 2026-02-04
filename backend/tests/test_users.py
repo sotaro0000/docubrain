@@ -4,8 +4,7 @@ from fastapi.testclient import TestClient
 # from sqlalchemy.orm import sessionmaker
 from main import app
 
-# from database import Base
-from database import get_db
+# from database import Base,get_db
 # from models.user import User
 
 # テスト用DB
